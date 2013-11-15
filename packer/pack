@@ -1,0 +1,20 @@
+#!/bin/bash
+chmod 777 *
+echo Making Required Directorys
+if [[ ! -e modules ]]; then
+            mkdir -p modules
+            mkdir -p modules/prima
+fi
+echo Copying Any Compiled Modules
+find '../' -name "adsprpc.ko" -exec cp -av {} modules/ \;
+find '../' -name "wlan.ko" -exec cp -av {} modules/prima/ \;
+echo Creating RamDisk
+#./mkbootfs ramdisk | gzip > ramdisk.gz
+NOW=$(date +"%m-%d-%y_%H:%M")
+echo Copying zImage
+find '../' -name "zImage" -exec cp -av {} zImage \;
+echo Compiling ColorOS-"$NOW".img
+./abootimg --create ColorOS-1.0.2i-Beta-"$NOW".img -f bootimg.cfg -k zImage -r ramdisk.gz
+echo Completed Builing ColorOS-1.0.2i-Beta-"$NOW".img
+rm zImage
+rm -rf modules
